@@ -8,8 +8,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-scanner/1.4.2/qr-scanner.legacy.min.js"></script>
 </head>
 <body>
-  <video id="video"></video>
-  <div id="output"></div>
+<div class="ui tabular menu">
+  <a class="active item">Scanner</a>
+</div>
+
+<div id="app" class="ui centered grid">
+  <div class="four wide column" style="height: 95vh;">
+    <canvas id="canvas"></canvas>
+  </div>
+  <div class="eight wide column">
+    <h2>Camera Image</h2>
+
+    <video id="video"></video>
+    <div id="output"></div>
+
+    <div class="two ui buttons">
+      <button class="ui blue labeled icon button" v-on:click="cameraStart">
+        <i class="camera icon"></i>Start Camera
+      </button>
+      <button class="ui red labeled icon button" v-on:click="cameraStop">
+        <i class="stop circle outline icon"></i>Stop Camera
+      </button>
+    </div>
+  </div>
+  <div class="four wide column"></div>
+</div>
+
 <script type="text/javascript">
 const video = document.querySelector("#video");
 const output = document.querySelector("#output");
