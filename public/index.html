@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset=utf-8>
+  <title>Receipt Scanner</title>
+  <link rel="shortcut icon" type="image/jpg" href="/favicon.png"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-scanner/1.4.2/qr-scanner.legacy.min.js"></script>
+</head>
+<body>
+  <video id="video"></video>
+  <div id="output"></div>
+<script type="text/javascript">
+const video = document.querySelector("#video");
+const output = document.querySelector("#output");
+let processed = "";
+const qrScanner = new QrScanner(video, result => {
+  if (result !== processed) {
+    fetch("/api/qrcode", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(result) })
+      .then(data => output.innerText = "Success: " + JSON.stringify(data))
+      .catch(error => output.innerText = "Error: " + JSON.stringify(error));
+
+    processed = result;
+  }
+});
+qrScanner.start();
+</script>
+</body>  
