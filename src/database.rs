@@ -46,6 +46,23 @@ impl Database {
         Ok(result)
     }
 
+    pub async fn next_uncatigorized_product(
+        &self,
+        ticket: &str,
+    ) -> Result<Option<String>, Box<dyn Error>> {
+        info!("Count ticket: {}", ticket);
+
+        let lock = self.inner.lock().await;
+        let mut query = lock.prepare("SELECT t.product FROM tickets AS t LEFT OUTER JOIN products AS p ON ( p.product = t.product ) WHERE p.product IS NULL LIMIT 1")?;
+
+        let result = match query.next()? {
+            State::Row => Some(query.read(0)?),
+            State::Done => None,
+        };
+
+        Ok(result)
+    }
+
     pub async fn set_category_name(
         &self,
         product: &str,

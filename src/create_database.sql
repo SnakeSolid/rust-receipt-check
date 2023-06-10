@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS tickets (
     sum REAL NOT NULL
 );
 CREATE INDEX IF NOT EXISTS tickets_ticket ON tickets ( ticket, product );
+CREATE INDEX IF NOT EXISTS tickets_product ON tickets ( product );
