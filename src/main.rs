@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let index = warp::get()
         .and(warp::path::end())
-        .and(warp::fs::file("public/index.html"));
+        .and(warp::fs::file("public/scanner.html"));
     let qrcode = warp::path!("api" / "qrcode")
         .and(warp::post())
         .and(warp::body::json())

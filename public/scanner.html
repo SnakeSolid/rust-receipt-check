@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Receipt Scanner</title>
+    <link rel="shortcut icon" type="image/jpg" href="/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-scanner/1.4.2/qr-scanner.legacy.min.js"></script>
+    <script src="/scanner.js" defer="defer"></script>
+  </head>
+  <body>
+    <div class="ui inverted menu">
+      <a class="active item">Scanner</a>
+      <a class="item" href="/receipts.html">Receipts</a>
+      <a class="item" href="/categories.html">Categories</a>
+    </div>
+
+    <div id="app" class="ui container">
+      <h2>Camera Image</h2>
+
+      <video id="video"></video>
+      <div id="output"></div>
+
+      <div class="two ui buttons">
+        <button class="ui blue labeled icon button" v-on:click="cameraStart">
+          <i class="camera icon"></i>Start Camera
+        </button>
+        <button class="ui red labeled icon button" v-on:click="cameraStop">
+          <i class="stop circle outline icon"></i>Stop Camera
+        </button>
+      </div>
+
+      <div class="ui positive message" v-if="success">
+        <div class="header">
+          Success
+        </div>
+        {{ message }}
+      </div>
+
+      <div class="ui negative message" v-if="error">
+        <div class="header">
+          Error
+        </div>
+        {{ message }}
+      </div>
+    </div>
+  </body>
+</html>

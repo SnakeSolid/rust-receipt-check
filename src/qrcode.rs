@@ -23,7 +23,7 @@ impl TicketReply {
 
     pub fn error(message: &str) -> Self {
         TicketReply {
-            success: true,
+            success: false,
             message: Some(message.into()),
         }
     }
