@@ -57,7 +57,7 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
         );
 
         if let Some(category_name) = category_name {
-            println!(
+            info!(
                 "{};{};{};{:0.3};{:0.2}",
                 date_string,
                 category_name.category(),
@@ -66,7 +66,7 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
                 item.sum(),
             );
         } else {
-            println!(
+            info!(
                 "{};{};;{:0.3};{:0.2}",
                 date_string,
                 item.name(),

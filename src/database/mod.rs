@@ -33,7 +33,7 @@ impl Database {
         &self,
         product: &str,
     ) -> Result<Option<CategoryData>, Box<dyn Error>> {
-        info!("Category name: product = {}", product);
+        debug!("Category name: product = {}", product);
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare(
@@ -57,7 +57,7 @@ impl Database {
     }
 
     pub async fn select_category_names(&self) -> Result<Vec<ProductData>, Box<dyn Error>> {
-        info!("Category names");
+        debug!("Category names");
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare(
@@ -85,7 +85,7 @@ impl Database {
         category: &str,
         name: &str,
     ) -> Result<(), Box<dyn Error>> {
-        info!(
+        debug!(
             "Set category name: product = {}, category = {}, name = {}",
             product, category, name
         );
@@ -102,7 +102,7 @@ impl Database {
     }
 
     pub async fn ticket_item_count(&self, ticket: &str) -> Result<usize, Box<dyn Error>> {
-        info!("Count ticket: {}", ticket);
+        debug!("Count ticket: {}", ticket);
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare("SELECT COUNT(*) FROM tickets WHERE ticket = :ticket")?;
@@ -117,7 +117,7 @@ impl Database {
     }
 
     pub async fn remove_ticket_items(&self) -> Result<(), Box<dyn Error>> {
-        info!("Remove ticket items");
+        debug!("Remove ticket items");
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare("DELETE FROM tickets")?;
@@ -134,7 +134,7 @@ impl Database {
         quantity: f64,
         sum: f64,
     ) -> Result<(), Box<dyn Error>> {
-        info!(
+        debug!(
             "Insert ticket: ticket = {}, date = {}, product = {}, quantity = {}, sum = {}",
             ticket, date, product, quantity, sum
         );
@@ -154,7 +154,7 @@ impl Database {
     }
 
     pub async fn select_ticket_items(&self) -> Result<Vec<TicketItemData>, Box<dyn Error>> {
-        info!("Ticket items");
+        debug!("Ticket items");
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare(
