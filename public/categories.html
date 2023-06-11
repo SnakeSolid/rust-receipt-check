@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Receipt Scanner</title>
+    <link rel="shortcut icon" type="image/jpg" href="/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-scanner/1.4.2/qr-scanner.legacy.min.js"></script>
+    <script src="/categories.js" defer="defer"></script>
+  </head>
+  <body>
+    <div class="ui inverted menu">
+      <a class="item" href="/scanner.html">Scanner</a>
+      <a class="item" href="/receipts.html">Receipts</a>
+      <a class="active item">Categories</a>
+    </div>
+
+    <div id="app" class="ui container">
+      <h2>Product Categorization</h2>
+
+      <button class="fluid ui blue labeled icon button" v-on:click="categoriesUpdate">
+        <i class="sync icon"></i>Update Categories
+      </button>
+
+      <div class="ui negative message" v-if="error">
+        <div class="header">
+          Error
+        </div>
+        {{ message }}
+      </div>
+
+      <table class="ui compact striped selectable table" v-if="hasItems()">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Name</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody v-for="item in items">
+          <tr>
+            <td>{{ item.product }}</td>
+            <td>
+              <div class="ui corner labeled input" :class="{ error: !categoryValid(item) }">
+                <input type="text" placeholder="Category..." v-model="item.category" />
+                <div class="ui corner label">
+                  <i class="asterisk icon"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="ui corner labeled input" :class="{ error: !nameValid(item) }">
+                <input type="text" placeholder="Name..." v-model="item.name" />
+                <div class="ui corner label">
+                  <i class="asterisk icon"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <button
+                class="ui primary button"
+                :class="{ disabled: !itemValid(item) }"
+                v-on:click="productUpdate(item)"
+              >
+                Update
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

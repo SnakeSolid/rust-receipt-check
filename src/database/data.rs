@@ -53,17 +53,14 @@ impl TicketItemData {
 }
 
 #[derive(Debug)]
-pub struct CategoryNameData {
+pub struct CategoryData {
     category: String,
     name: String,
 }
 
-impl CategoryNameData {
+impl CategoryData {
     pub fn new(category: String, name: String) -> Self {
-        Self {
-            category: category.into(),
-            name: name.into(),
-        }
+        Self { category, name }
     }
 
     pub fn category(&self) -> &str {
@@ -72,5 +69,34 @@ impl CategoryNameData {
 
     pub fn name(&self) -> &str {
         &self.name
+    }
+}
+
+#[derive(Debug)]
+pub struct ProductData {
+    product: String,
+    category: Option<String>,
+    name: Option<String>,
+}
+
+impl ProductData {
+    pub fn new(product: String, category: Option<String>, name: Option<String>) -> Self {
+        Self {
+            product,
+            category,
+            name,
+        }
+    }
+
+    pub fn product(&self) -> &str {
+        &self.product
+    }
+
+    pub fn category(&self) -> Option<&String> {
+        self.category.as_ref()
+    }
+
+    pub fn name(&self) -> Option<&String> {
+        self.name.as_ref()
     }
 }

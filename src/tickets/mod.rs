@@ -24,7 +24,7 @@ macro_rules! no_fail {
 pub async fn tickets(database: Database) -> Result<impl warp::Reply, Infallible> {
     info!("Request tickets");
 
-    let items = no_fail!("Failed to read items", database.ticket_items().await);
+    let items = no_fail!("Failed to read items", database.select_ticket_items().await);
 
     Ok(warp::reply::json(&Reply::success(items)))
 }

@@ -53,7 +53,7 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
 
         let category_name = no_fail!(
             "Failed to query product",
-            database.category_name(item.name()).await
+            database.select_category_name(item.name()).await
         );
 
         if let Some(category_name) = category_name {

@@ -1,6 +1,7 @@
 mod data;
 
-pub use self::data::CategoryNameData;
+pub use self::data::CategoryData;
+pub use self::data::ProductData;
 pub use self::data::TicketItemData;
 
 use sqlite::Connection;
@@ -28,15 +29,18 @@ impl Database {
         })
     }
 
-    pub async fn category_name(
+    pub async fn select_category_name(
         &self,
         product: &str,
-    ) -> Result<Option<CategoryNameData>, Box<dyn Error>> {
+    ) -> Result<Option<CategoryData>, Box<dyn Error>> {
         info!("Category name: product = {}", product);
 
         let lock = self.inner.lock().await;
-        let mut query =
-            lock.prepare("SELECT category, name FROM products WHERE product = :product AND category IS NOT NULL AND name IS NOT NULL")?;
+        let mut query = lock.prepare(
+            "SELECT category, name
+            FROM products
+            WHERE product = :product AND category IS NOT NULL AND name IS NOT NULL",
+        )?;
         query.bind((":product", product))?;
 
         let result = match query.next()? {
@@ -44,7 +48,7 @@ impl Database {
                 let category = query.read(0)?;
                 let name = query.read(1)?;
 
-                Some(CategoryNameData::new(category, name))
+                Some(CategoryData::new(category, name))
             }
             State::Done => None,
         };
@@ -52,24 +56,30 @@ impl Database {
         Ok(result)
     }
 
-    pub async fn next_uncatigorized_product(
-        &self,
-        ticket: &str,
-    ) -> Result<Option<String>, Box<dyn Error>> {
-        info!("Count ticket: {}", ticket);
+    pub async fn select_category_names(&self) -> Result<Vec<ProductData>, Box<dyn Error>> {
+        info!("Category names");
 
         let lock = self.inner.lock().await;
-        let mut query = lock.prepare("SELECT t.product FROM tickets AS t LEFT OUTER JOIN products AS p ON ( p.product = t.product ) WHERE p.product IS NULL LIMIT 1")?;
+        let mut query = lock.prepare(
+            "SELECT DISTINCT t.product, p.category, p.name
+            FROM tickets AS t LEFT OUTER JOIN products AS p ON (p.product = t.product)
+            ORDER BY t.product",
+        )?;
+        let mut result = Vec::new();
 
-        let result = match query.next()? {
-            State::Row => Some(query.read(0)?),
-            State::Done => None,
-        };
+        while let State::Row = query.next()? {
+            let product = query.read(0)?;
+            let category = query.read(1)?;
+            let name = query.read(2)?;
+            let item = ProductData::new(product, category, name);
+
+            result.push(item);
+        }
 
         Ok(result)
     }
 
-    pub async fn set_category_name(
+    pub async fn updatre_product_category(
         &self,
         product: &str,
         category: &str,
@@ -106,12 +116,11 @@ impl Database {
         Ok(result as usize)
     }
 
-    pub async fn remove_ticket(&self, ticket: &str) -> Result<(), Box<dyn Error>> {
-        info!("Remove ticket: {}", ticket);
+    pub async fn remove_ticket_items(&self) -> Result<(), Box<dyn Error>> {
+        info!("Remove ticket items");
 
         let lock = self.inner.lock().await;
-        let mut query = lock.prepare("DELETE FROM tickets WHERE ticket = :ticket")?;
-        query.bind((":ticket", ticket))?;
+        let mut query = lock.prepare("DELETE FROM tickets")?;
         query.next()?;
 
         Ok(())
@@ -142,7 +151,7 @@ impl Database {
         Ok(())
     }
 
-    pub async fn ticket_items(&self) -> Result<Vec<TicketItemData>, Box<dyn Error>> {
+    pub async fn select_ticket_items(&self) -> Result<Vec<TicketItemData>, Box<dyn Error>> {
         info!("Ticket items");
 
         let lock = self.inner.lock().await;

@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate log;
 
+mod categories;
 mod database;
 mod ofd;
 mod qrcode;
@@ -31,8 +32,22 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .and(warp::post())
         .and(with(database.clone()))
         .and_then(tickets::tickets);
+    let categories_list = warp::path!("api" / "categories" / "list")
+        .and(warp::post())
+        .and(with(database.clone()))
+        .and_then(categories::list);
+    let categories_update = warp::path!("api" / "categories" / "update")
+        .and(warp::post())
+        .and(warp::body::json())
+        .and(with(database.clone()))
+        .and_then(categories::update);
     let public = warp::get().and(warp::fs::dir("public"));
-    let routes = index.or(qrcode).or(tickets).or(public);
+    let routes = index
+        .or(qrcode)
+        .or(tickets)
+        .or(categories_list)
+        .or(categories_update)
+        .or(public);
 
     info!("Starting server...");
 
