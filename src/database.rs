@@ -35,10 +35,10 @@ impl Database {
 
         let result = match query.next()? {
             State::Row => {
-                let category: String = query.read(0)?;
-                let name: String = query.read(1)?;
+                let category = query.read(0)?;
+                let name = query.read(1)?;
 
-                Some(CategoryName::new(&category, &name))
+                Some(CategoryName::new(category, name))
             }
             State::Done => None,
         };
@@ -119,7 +119,7 @@ impl Database {
         sum: f64,
     ) -> Result<(), Box<dyn Error>> {
         info!(
-            "Insert ticket: {},  product = {}, quantity = {}, sum = {}",
+            "Insert ticket: ticket = {}, product = {}, quantity = {}, sum = {}",
             ticket, product, quantity, sum
         );
 
@@ -135,6 +135,83 @@ impl Database {
 
         Ok(())
     }
+
+    pub async fn ticket_items(&self) -> Result<Vec<TicketItemData>, Box<dyn Error>> {
+        info!("Ticket items");
+
+        let lock = self.inner.lock().await;
+        let mut query = lock.prepare(
+            "SELECT t.ticket, t.product, p.category, p.name, t.quantity, t.sum FROM tickets AS t LEFT OUTER JOIN products AS p ON (p.product = t.product)",
+        )?;
+        let mut result = Vec::new();
+
+        while let State::Row = query.next()? {
+            let ticket = query.read(0)?;
+            let product = query.read(1)?;
+            let category = query.read(2)?;
+            let name = query.read(3)?;
+            let quantity = query.read(4)?;
+            let sum = query.read(5)?;
+            let item = TicketItemData::new(ticket, product, category, name, quantity, sum);
+            result.push(item);
+        }
+
+        Ok(result)
+    }
+}
+
+#[derive(Debug)]
+pub struct TicketItemData {
+    ticket: String,
+    product: String,
+    category: Option<String>,
+    name: Option<String>,
+    quantity: f64,
+    sum: f64,
+}
+
+impl TicketItemData {
+    pub fn new(
+        ticket: String,
+        product: String,
+        category: Option<String>,
+        name: Option<String>,
+        quantity: f64,
+        sum: f64,
+    ) -> Self {
+        Self {
+            ticket,
+            product,
+            category,
+            name,
+            quantity,
+            sum,
+        }
+    }
+
+    pub fn ticket(&self) -> &str {
+        &self.ticket
+    }
+
+    pub fn product(&self) -> &str {
+        &self.product
+    }
+
+    pub fn category(&self) -> Option<&String> {
+        self.category.as_ref()
+    }
+
+    pub fn name(&self) -> Option<&String> {
+        self.name.as_ref()
+    }
+
+    pub fn quantity(&self) -> f64 {
+        self.quantity
+    }
+
+    pub fn sum(&self) -> f64 {
+        self.sum
+    }
 }
 
 #[derive(Debug)]
@@ -144,7 +221,7 @@ pub struct CategoryName {
 }
 
 impl CategoryName {
-    pub fn new(category: &str, name: &str) -> Self {
+    pub fn new(category: String, name: String) -> Self {
         Self {
             category: category.into(),
             name: name.into(),

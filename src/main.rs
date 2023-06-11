@@ -4,7 +4,7 @@ extern crate log;
 mod database;
 mod ofd;
 mod qrcode;
-mod util;
+mod tickets;
 
 use crate::database::Database;
 use std::convert::Infallible;
@@ -29,9 +29,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .and_then(qrcode::qrcode);
     let tickets = warp::path!("api" / "tickets")
         .and(warp::post())
-        .and(warp::body::json())
         .and(with(database.clone()))
-        .and_then(qrcode::qrcode);
+        .and_then(tickets::tickets);
     let public = warp::get().and(warp::fs::dir("public"));
     let routes = index.or(qrcode).or(tickets).or(public);
 

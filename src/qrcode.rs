@@ -1,5 +1,4 @@
 use crate::database::Database;
-use crate::no_fail;
 use crate::ofd::load_params;
 use crate::ofd::load_ticket;
 use serde::Deserialize;
@@ -8,25 +7,40 @@ use std::convert::Infallible;
 use time::macros::format_description;
 
 #[derive(Debug, Serialize, Deserialize)]
-struct TicketReply {
+struct Reply {
     success: bool,
     message: Option<String>,
 }
 
-impl TicketReply {
+impl Reply {
     pub fn success() -> Self {
-        TicketReply {
+        Reply {
             success: true,
             message: None,
         }
     }
 
     pub fn error(message: &str) -> Self {
-        TicketReply {
+        Reply {
             success: false,
             message: Some(message.into()),
         }
     }
+}
+
+macro_rules! no_fail {
+    ($message:expr, $callback:expr) => {
+        match $callback {
+            Ok(result) => result,
+            Err(error) => {
+                warn!("{}: {}", $message, error);
+
+                let message = format!("{}", error);
+
+                return Ok(warp::reply::json(&Reply::error(&message)));
+            }
+        }
+    };
 }
 
 pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply, Infallible> {
@@ -42,7 +56,7 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
     if count > 0 {
         info!("Ticket already exists.");
 
-        return Ok(warp::reply::json(&TicketReply::success()));
+        return Ok(warp::reply::json(&Reply::success()));
     }
 
     let ticket = no_fail!("Failed to load ticket", load_ticket(&params).await);
@@ -82,5 +96,5 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
         }
     }
 
-    Ok(warp::reply::json(&TicketReply::success()))
+    Ok(warp::reply::json(&Reply::success()))
 }
