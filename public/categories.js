@@ -28,7 +28,7 @@ const application = Vue.createApp({
 		},
 
 		itemValid(item) {
-			return item.category !== "" && item.item !== "";
+			return item.category !== "" && item.name !== "";
 		},
 
 		categoriesUpdate() {
