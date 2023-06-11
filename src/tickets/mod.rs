@@ -21,10 +21,21 @@ macro_rules! no_fail {
     };
 }
 
-pub async fn tickets(database: Database) -> Result<impl warp::Reply, Infallible> {
-    info!("Request tickets");
+pub async fn list(database: Database) -> Result<impl warp::Reply, Infallible> {
+    info!("Request ticket list");
 
     let items = no_fail!("Failed to read items", database.select_ticket_items().await);
 
-    Ok(warp::reply::json(&Reply::success(items)))
+    Ok(warp::reply::json(&Reply::list(items)))
+}
+
+pub async fn clear(database: Database) -> Result<impl warp::Reply, Infallible> {
+    info!("Request tickets clear");
+
+    no_fail!(
+        "Failed to clear items",
+        database.remove_ticket_items().await
+    );
+
+    Ok(warp::reply::json(&Reply::success()))
 }

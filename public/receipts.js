@@ -20,7 +20,7 @@ const application = Vue.createApp({
 		},
 
 		receiptUpdate() {
-			fetch("/api/tickets", { method: "POST" })
+			fetch("/api/tickets/list", { method: "POST" })
 				.then(data => data.json())
 				.then(data => {
 					this.loading = false;
@@ -28,7 +28,7 @@ const application = Vue.createApp({
 					this.items = data.items.map(item => {
 						return {
 							categorized: item.type === "Categorized",
-							ticket: item.ticket,
+							date: item.date,
 							product: item.product,
 							category: item.category,
 							name: item.name,
@@ -48,7 +48,24 @@ const application = Vue.createApp({
 			this.loading = true;
 		},
 
-		receiptClear() {},
+		receiptClear() {
+			fetch("/api/tickets/clear", { method: "POST" })
+				.then(data => data.json())
+				.then(data => {
+					this.loading = false;
+					this.error = false;
+					this.items = [];
+					this.message = "";
+				})
+				.catch(error => {
+					this.loading = false;
+					this.error = false;
+					this.message = error;
+					this.items = [];
+				});
+
+			this.loading = true;
+		},
 	},
 });
 application.mount("#app");

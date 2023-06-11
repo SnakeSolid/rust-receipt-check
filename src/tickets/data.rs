@@ -6,14 +6,14 @@ use serde::Serialize;
 #[serde(tag = "type")]
 pub enum ReplyItem {
     Categorized {
-        ticket: String,
+        date: String,
         category: String,
         name: String,
         quantity: f64,
         sum: f64,
     },
     Uncategorized {
-        ticket: String,
+        date: String,
         product: String,
         quantity: f64,
         sum: f64,
@@ -24,14 +24,14 @@ impl From<TicketItemData> for ReplyItem {
     fn from(value: TicketItemData) -> Self {
         match (value.category(), value.name()) {
             (Some(category), Some(name)) => ReplyItem::Categorized {
-                ticket: value.ticket().into(),
+                date: value.date().into(),
                 category: category.clone(),
                 name: name.clone(),
                 quantity: value.quantity(),
                 sum: value.sum(),
             },
             _ => ReplyItem::Uncategorized {
-                ticket: value.ticket().into(),
+                date: value.date().into(),
                 product: value.product().into(),
                 quantity: value.quantity(),
                 sum: value.sum(),
@@ -41,28 +41,39 @@ impl From<TicketItemData> for ReplyItem {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Reply {
-    success: bool,
-    items: Option<Vec<ReplyItem>>,
-    message: Option<String>,
+#[serde(untagged)]
+pub enum Reply {
+    List {
+        success: bool,
+        items: Vec<ReplyItem>,
+    },
+    Success {
+        success: bool,
+    },
+    Error {
+        success: bool,
+        message: String,
+    },
 }
 
 impl Reply {
-    pub fn success(items: Vec<TicketItemData>) -> Self {
+    pub fn list(items: Vec<TicketItemData>) -> Self {
         let items = items.into_iter().map(ReplyItem::from).collect();
 
-        Reply {
+        Reply::List {
             success: true,
-            items: Some(items),
-            message: None,
+            items,
         }
     }
 
+    pub fn success() -> Self {
+        Reply::Success { success: true }
+    }
+
     pub fn error(message: &str) -> Self {
-        Reply {
+        Reply::Error {
             success: false,
-            items: None,
-            message: Some(message.into()),
+            message: message.into(),
         }
     }
 }

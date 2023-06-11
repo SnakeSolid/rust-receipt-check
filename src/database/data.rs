@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct TicketItemData {
-    ticket: String,
+    date: String,
     product: String,
     category: Option<String>,
     name: Option<String>,
@@ -10,7 +10,7 @@ pub struct TicketItemData {
 
 impl TicketItemData {
     pub fn new(
-        ticket: String,
+        date: String,
         product: String,
         category: Option<String>,
         name: Option<String>,
@@ -18,7 +18,7 @@ impl TicketItemData {
         sum: f64,
     ) -> Self {
         Self {
-            ticket,
+            date,
             product,
             category,
             name,
@@ -27,8 +27,8 @@ impl TicketItemData {
         }
     }
 
-    pub fn ticket(&self) -> &str {
-        &self.ticket
+    pub fn date(&self) -> &str {
+        &self.date
     }
 
     pub fn product(&self) -> &str {

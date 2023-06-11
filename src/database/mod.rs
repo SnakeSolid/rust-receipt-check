@@ -129,20 +129,22 @@ impl Database {
     pub async fn insert_ticket_item(
         &self,
         ticket: &str,
+        date: &str,
         product: &str,
         quantity: f64,
         sum: f64,
     ) -> Result<(), Box<dyn Error>> {
         info!(
-            "Insert ticket: ticket = {}, product = {}, quantity = {}, sum = {}",
-            ticket, product, quantity, sum
+            "Insert ticket: ticket = {}, date = {}, product = {}, quantity = {}, sum = {}",
+            ticket, date, product, quantity, sum
         );
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare(
-            "INSERT INTO tickets (ticket, product, quantity, sum) VALUES (:ticket, :product, :quantity, :sum)",
+            "INSERT INTO tickets (ticket, date, product, quantity, sum) VALUES (:ticket, :date, :product, :quantity, :sum)",
         )?;
         query.bind((":ticket", ticket))?;
+        query.bind((":date", date))?;
         query.bind((":product", product))?;
         query.bind((":quantity", quantity))?;
         query.bind((":sum", sum))?;
@@ -156,21 +158,21 @@ impl Database {
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare(
-            "SELECT t.ticket, t.product, p.category, p.name, t.quantity, t.sum
+            "SELECT t.date, t.product, p.category, p.name, t.quantity, t.sum
         	FROM tickets AS t
         		LEFT OUTER JOIN products AS p ON (p.product = t.product)
-        	ORDER BY t.ticket, t.product",
+        	ORDER BY t.date, t.product",
         )?;
         let mut result = Vec::new();
 
         while let State::Row = query.next()? {
-            let ticket = query.read(0)?;
+            let date = query.read(0)?;
             let product = query.read(1)?;
             let category = query.read(2)?;
             let name = query.read(3)?;
             let quantity = query.read(4)?;
             let sum = query.read(5)?;
-            let item = TicketItemData::new(ticket, product, category, name, quantity, sum);
+            let item = TicketItemData::new(date, product, category, name, quantity, sum);
             result.push(item);
         }
 

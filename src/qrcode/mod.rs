@@ -47,7 +47,7 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
         no_fail!(
             "Failed to save product",
             database
-                .insert_ticket_item(&key, item.name(), item.quantity(), item.sum())
+                .insert_ticket_item(&key, &date_string, item.name(), item.quantity(), item.sum())
                 .await
         );
 

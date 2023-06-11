@@ -28,10 +28,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .and(warp::body::json())
         .and(with(database.clone()))
         .and_then(qrcode::qrcode);
-    let tickets = warp::path!("api" / "tickets")
+    let tickets_list = warp::path!("api" / "tickets" / "list")
         .and(warp::post())
         .and(with(database.clone()))
-        .and_then(tickets::tickets);
+        .and_then(tickets::list);
+    let tickets_clear = warp::path!("api" / "tickets" / "clear")
+        .and(warp::post())
+        .and(with(database.clone()))
+        .and_then(tickets::clear);
     let categories_list = warp::path!("api" / "categories" / "list")
         .and(warp::post())
         .and(with(database.clone()))
@@ -44,7 +48,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let public = warp::get().and(warp::fs::dir("public"));
     let routes = index
         .or(qrcode)
-        .or(tickets)
+        .or(tickets_list)
+        .or(tickets_clear)
         .or(categories_list)
         .or(categories_update)
         .or(public);
