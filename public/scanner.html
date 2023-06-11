@@ -19,9 +19,6 @@
     <div id="app" class="ui container">
       <h2>Camera Image</h2>
 
-      <video id="video"></video>
-      <div id="output"></div>
-
       <div class="two ui buttons">
         <button class="ui blue labeled icon button" v-on:click="cameraStart">
           <i class="camera icon"></i>Start Camera
@@ -30,6 +27,8 @@
           <i class="stop circle outline icon"></i>Stop Camera
         </button>
       </div>
+
+      <video id="video"></video>
 
       <div class="ui positive message" v-if="success">
         <div class="header">

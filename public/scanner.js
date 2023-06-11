@@ -26,6 +26,13 @@ const application = Vue.createApp({
 			this.qrScanner.stop();
 		},
 
+		backgroundFlash(color) {
+			document.body.style["background-color"] = color;
+			setTimeout(() => {
+				document.body.style["background-color"] = null;
+			}, 200);
+		},
+
 		updateQrCode(qrCode) {
 			if (this.qrCode !== qrCode) {
 				fetch("/api/qrcode", {
@@ -39,12 +46,14 @@ const application = Vue.createApp({
 						this.success = data.success;
 						this.error = !data.success;
 						this.message = data.message;
+						this.backgroundFlash(data.success ? "green" : "red");
 					})
 					.catch(error => {
 						this.loading = false;
 						this.success = false;
 						this.error = true;
 						this.message = error;
+						this.backgroundFlash("red");
 					});
 
 				this.loading = true;
