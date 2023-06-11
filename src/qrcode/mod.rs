@@ -1,32 +1,12 @@
+mod data;
+
+pub use self::data::Reply;
+
 use crate::database::Database;
 use crate::ofd::load_params;
 use crate::ofd::load_ticket;
-use serde::Deserialize;
-use serde::Serialize;
 use std::convert::Infallible;
 use time::macros::format_description;
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Reply {
-    success: bool,
-    message: Option<String>,
-}
-
-impl Reply {
-    pub fn success() -> Self {
-        Reply {
-            success: true,
-            message: None,
-        }
-    }
-
-    pub fn error(message: &str) -> Self {
-        Reply {
-            success: false,
-            message: Some(message.into()),
-        }
-    }
-}
 
 macro_rules! no_fail {
     ($message:expr, $callback:expr) => {

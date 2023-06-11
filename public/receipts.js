@@ -1,6 +1,10 @@
 "use strict";
 
 const application = Vue.createApp({
+	mounted() {
+		this.receiptUpdate();
+	},
+
 	data() {
 		return {
 			loading: false,

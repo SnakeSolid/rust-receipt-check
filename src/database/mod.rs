@@ -1,4 +1,10 @@
-use sqlite::{Connection, State};
+mod data;
+
+pub use self::data::CategoryNameData;
+pub use self::data::TicketItemData;
+
+use sqlite::Connection;
+use sqlite::State;
 use std::error::Error;
 use std::path::Path;
 use std::sync::Arc;
@@ -25,7 +31,7 @@ impl Database {
     pub async fn category_name(
         &self,
         product: &str,
-    ) -> Result<Option<CategoryName>, Box<dyn Error>> {
+    ) -> Result<Option<CategoryNameData>, Box<dyn Error>> {
         info!("Category name: product = {}", product);
 
         let lock = self.inner.lock().await;
@@ -38,7 +44,7 @@ impl Database {
                 let category = query.read(0)?;
                 let name = query.read(1)?;
 
-                Some(CategoryName::new(category, name))
+                Some(CategoryNameData::new(category, name))
             }
             State::Done => None,
         };
@@ -141,7 +147,10 @@ impl Database {
 
         let lock = self.inner.lock().await;
         let mut query = lock.prepare(
-            "SELECT t.ticket, t.product, p.category, p.name, t.quantity, t.sum FROM tickets AS t LEFT OUTER JOIN products AS p ON (p.product = t.product)",
+            "SELECT t.ticket, t.product, p.category, p.name, t.quantity, t.sum
+        	FROM tickets AS t
+        		LEFT OUTER JOIN products AS p ON (p.product = t.product)
+        	ORDER BY t.ticket, t.product",
         )?;
         let mut result = Vec::new();
 
@@ -157,82 +166,5 @@ impl Database {
         }
 
         Ok(result)
-    }
-}
-
-#[derive(Debug)]
-pub struct TicketItemData {
-    ticket: String,
-    product: String,
-    category: Option<String>,
-    name: Option<String>,
-    quantity: f64,
-    sum: f64,
-}
-
-impl TicketItemData {
-    pub fn new(
-        ticket: String,
-        product: String,
-        category: Option<String>,
-        name: Option<String>,
-        quantity: f64,
-        sum: f64,
-    ) -> Self {
-        Self {
-            ticket,
-            product,
-            category,
-            name,
-            quantity,
-            sum,
-        }
-    }
-
-    pub fn ticket(&self) -> &str {
-        &self.ticket
-    }
-
-    pub fn product(&self) -> &str {
-        &self.product
-    }
-
-    pub fn category(&self) -> Option<&String> {
-        self.category.as_ref()
-    }
-
-    pub fn name(&self) -> Option<&String> {
-        self.name.as_ref()
-    }
-
-    pub fn quantity(&self) -> f64 {
-        self.quantity
-    }
-
-    pub fn sum(&self) -> f64 {
-        self.sum
-    }
-}
-
-#[derive(Debug)]
-pub struct CategoryName {
-    category: String,
-    name: String,
-}
-
-impl CategoryName {
-    pub fn new(category: String, name: String) -> Self {
-        Self {
-            category: category.into(),
-            name: name.into(),
-        }
-    }
-
-    pub fn category(&self) -> &str {
-        &self.category
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
     }
 }
