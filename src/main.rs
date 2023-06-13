@@ -77,6 +77,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn with(value: Database) -> impl Filter<Extract = (Database,), Error = Infallible> + Clone {
+fn with<T>(value: T) -> impl Filter<Extract = (T,), Error = Infallible> + Clone
+where
+    T: Send + Sync + Clone,
+{
     warp::any().map(move || value.clone())
 }
