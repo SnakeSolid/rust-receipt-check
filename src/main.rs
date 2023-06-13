@@ -12,8 +12,6 @@ use crate::database::Database;
 use options::Options;
 use std::convert::Infallible;
 use std::error::Error;
-use std::net::IpAddr;
-use std::str::FromStr;
 use structopt::StructOpt;
 use warp::Filter;
 
@@ -71,7 +69,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .tls()
         .cert_path("tls/certificate.pem")
         .key_path("tls/key.pem")
-        .run((IpAddr::from_str(options.address())?, options.port()))
+        .run((options.address().clone(), options.port()))
         .await;
 
     Ok(())

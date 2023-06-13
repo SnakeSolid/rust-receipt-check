@@ -1,3 +1,4 @@
+use std::net::IpAddr;
 use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -6,7 +7,7 @@ use structopt::StructOpt;
 #[structopt(name = "receipt-check")]
 pub struct Options {
     #[structopt(short, long, default_value = "127.0.0.1")]
-    address: String,
+    address: IpAddr,
 
     #[structopt(short, long, default_value = "8080")]
     port: u16,
@@ -16,7 +17,7 @@ pub struct Options {
 }
 
 impl Options {
-    pub fn address(&self) -> &str {
+    pub fn address(&self) -> &IpAddr {
         &self.address
     }
 
