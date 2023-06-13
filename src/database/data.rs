@@ -53,26 +53,6 @@ impl TicketItemData {
 }
 
 #[derive(Debug)]
-pub struct CategoryData {
-    category: String,
-    name: String,
-}
-
-impl CategoryData {
-    pub fn new(category: String, name: String) -> Self {
-        Self { category, name }
-    }
-
-    pub fn category(&self) -> &str {
-        &self.category
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-}
-
-#[derive(Debug)]
 pub struct ProductData {
     product: String,
     category: Option<String>,

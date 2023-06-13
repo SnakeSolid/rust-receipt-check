@@ -50,30 +50,6 @@ pub async fn qrcode(data: String, database: Database) -> Result<impl warp::Reply
                 .insert_ticket_item(&key, &date_string, item.name(), item.quantity(), item.sum())
                 .await
         );
-
-        let category_name = no_fail!(
-            "Failed to query product",
-            database.select_category_name(item.name()).await
-        );
-
-        if let Some(category_name) = category_name {
-            info!(
-                "{};{};{};{:0.3};{:0.2}",
-                date_string,
-                category_name.category(),
-                category_name.name(),
-                item.quantity(),
-                item.sum(),
-            );
-        } else {
-            info!(
-                "{};{};;{:0.3};{:0.2}",
-                date_string,
-                item.name(),
-                item.quantity(),
-                item.sum()
-            );
-        }
     }
 
     Ok(warp::reply::json(&Reply::success()))

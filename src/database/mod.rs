@@ -1,6 +1,5 @@
 mod data;
 
-pub use self::data::CategoryData;
 pub use self::data::ProductData;
 pub use self::data::TicketItemData;
 
@@ -27,33 +26,6 @@ impl Database {
         Ok(Self {
             inner: Arc::new(Mutex::new(connection)),
         })
-    }
-
-    pub async fn select_category_name(
-        &self,
-        product: &str,
-    ) -> Result<Option<CategoryData>, Box<dyn Error>> {
-        debug!("Category name: product = {}", product);
-
-        let lock = self.inner.lock().await;
-        let mut query = lock.prepare(
-            "SELECT category, name
-            FROM products
-            WHERE product = :product AND category IS NOT NULL AND name IS NOT NULL",
-        )?;
-        query.bind((":product", product))?;
-
-        let result = match query.next()? {
-            State::Row => {
-                let category = query.read(0)?;
-                let name = query.read(1)?;
-
-                Some(CategoryData::new(category, name))
-            }
-            State::Done => None,
-        };
-
-        Ok(result)
     }
 
     pub async fn select_category_names(&self) -> Result<Vec<ProductData>, Box<dyn Error>> {
