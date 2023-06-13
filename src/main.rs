@@ -4,21 +4,32 @@ extern crate log;
 mod categories;
 mod database;
 mod ofd;
+mod options;
 mod qrcode;
 mod tickets;
 
 use crate::database::Database;
+use options::Options;
 use std::convert::Infallible;
 use std::error::Error;
+use std::net::IpAddr;
+use std::str::FromStr;
+use structopt::StructOpt;
 use warp::Filter;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();
 
-    info!("Create routes...");
+    info!("Parsing options...");
 
-    let database = Database::new("db.sqlite")?;
+    let options = Options::from_args();
+
+    info!("Setup database...");
+
+    let database = Database::new(options.database())?;
+
+    info!("Create routes...");
 
     let index = warp::get()
         .and(warp::path::end())
@@ -60,7 +71,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .tls()
         .cert_path("tls/certificate.pem")
         .key_path("tls/key.pem")
-        .run(([0, 0, 0, 0], 8081))
+        .run((IpAddr::from_str(options.address())?, options.port()))
         .await;
 
     Ok(())
