@@ -40,7 +40,7 @@ const application = Vue.createApp({
 				})
 				.catch(error => {
 					this.loading = false;
-					this.error = false;
+					this.error = true;
 					this.message = error;
 					this.items = [];
 				});
