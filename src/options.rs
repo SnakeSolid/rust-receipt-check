@@ -14,6 +14,12 @@ pub struct Options {
 
     #[structopt(short, long, parse(from_os_str), default_value = "db.sqlite")]
     database: PathBuf,
+
+    #[structopt(short, long, parse(from_os_str))]
+    key: PathBuf,
+
+    #[structopt(short, long, parse(from_os_str))]
+    certificate: PathBuf,
 }
 
 impl Options {
@@ -27,5 +33,13 @@ impl Options {
 
     pub fn database(&self) -> &Path {
         &self.database
+    }
+
+    pub fn key(&self) -> &Path {
+        &self.key
+    }
+
+    pub fn certificate(&self) -> &Path {
+        &self.certificate
     }
 }

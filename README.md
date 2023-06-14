@@ -6,12 +6,22 @@ Web service allow to scan QR code from receipt and convert receipt items to conv
 
 Following command line options are available for service:
 
-* `-a`, `--address` - default: `127.0.0.1`;
-* `-d`, `--database` - default: `db.sqlite`;
-* `-p`, `--port` - default: `8080`.
+* `-a`, `--address` - bind address, default: `127.0.0.1`;
+* `-d`, `--database` - database path, default: `db.sqlite`;
+* `-p`, `--port` - bind port, default: `8080`;
+* `-k`, `--key` - TLS certificate key;
+* `-c`, `--certificate` - TLS certificate path.
 
-NB: service always use generated TLS certificate from `tls` directory. If it's necessarily to change certificate it can
-be replaced with another one.
+### Generate Certificate
+
+By default `tls` directory contains generated certificate to simplify server usage. New certificate can be generated
+using `openssl` with following command:
+
+```
+openssl req -newkey rsa:2048 -nodes -keyout tls/key.pem -x509 -days 365 -out tls/certificate.pem
+```
+
+During certificate generation `openssl` will ask several questions.
 
 ### Build From Source
 

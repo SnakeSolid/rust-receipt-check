@@ -67,8 +67,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     warp::serve(routes)
         .tls()
-        .cert_path("tls/certificate.pem")
-        .key_path("tls/key.pem")
+        .cert_path(options.certificate())
+        .key_path(options.key())
         .run((options.address().clone(), options.port()))
         .await;
 
