@@ -2,6 +2,8 @@
 
 Web service allow to scan QR code from receipt and convert receipt items to convenient form.
 
+![User interface](images/receipt-check.png "User interface of Receipt Check")
+
 ### Command Line Options
 
 Following command line options are available for service:
